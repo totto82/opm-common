@@ -285,7 +285,8 @@ namespace Opm {
                     if (sourceIdx < deckItem.size()
                         && !deckItem.defaultApplied(sourceIdx))
                         {
-                            setDataPoint(sourceIdx, targetIdx, deckItem);
+                            this->multiplyValueAtIndex(targetIdx, deckItem.getSIDouble(sourceIdx));
+                            //setDataPoint(sourceIdx, targetIdx, deckItem);
                         }
                 }
             } else {
