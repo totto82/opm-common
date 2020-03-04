@@ -76,6 +76,17 @@ GuideRate::GuideRate(const Schedule& schedule_arg) :
 {}
 
 
+bool GuideRate::has(const std::string& wgname, size_t report_step) const {
+    const auto& config = this->schedule.guideRateConfig(report_step);
+    if (config.has_group(wgname)) {
+        const auto iter = this->values.find(wgname);
+        if (iter != this->values.end()) {
+            return true;
+        }
+        return false;
+    }
+    return true; // return true for wells
+}
 
 double GuideRate::get(const std::string& well, Well::GuideRateTarget target) const {
     auto model_target = GuideRateModel::convert_target(target);

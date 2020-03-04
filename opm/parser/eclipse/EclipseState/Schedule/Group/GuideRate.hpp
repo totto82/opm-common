@@ -51,6 +51,10 @@ struct GuideRateValue {
         return !(*this == other);
     }
 
+    bool operator+=(const GuideRateValue& other) {
+        return (this->value += other.value);
+    }
+
     double sim_time;
     double value;
     GuideRateModel::Target target;
@@ -81,6 +85,9 @@ public:
     double get(const std::string& well, Well::GuideRateTarget target) const;
     double get(const std::string& group, Group::GuideRateTarget target) const;
     double get(const std::string& name, GuideRateModel::Target model_target) const;
+    bool has(const std::string& wgname, size_t report_step) const;
+
+
 
 private:
     void well_compute(const std::string& wgname, size_t report_step, double sim_time, double oil_pot, double gas_pot, double wat_pot);
