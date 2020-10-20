@@ -804,7 +804,9 @@ double Well::getRefDepth() const {
                                      + name()
                                      + ". Can not infer reference depth" );
     }
-    return this->connections->get(0).depth();
+    double refDepth = this->connections->get(0).depth();
+    this->ref_depth = refDepth;
+    return refDepth;
 }
 
 

@@ -621,7 +621,7 @@ private:
     std::size_t insert_index;
     int headI;
     int headJ;
-    double ref_depth;
+    mutable double ref_depth;
     double drainage_radius;
     bool allow_cross_flow;
     bool automatic_shutin;
