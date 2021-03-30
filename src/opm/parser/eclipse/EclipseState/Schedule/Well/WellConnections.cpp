@@ -367,7 +367,7 @@ inline std::array< size_t, 3> directionIndices(const Opm::Connection::Direction 
             // Angle of completion exposed to flow.  We assume centre
             // placement so there's complete exposure (= 2\pi).
             const double angle = 6.2831853071795864769252867665590057683943387987502116419498;
-            std::array<double,3> cell_size = grid.getCellDims(I,J,k);
+            std::array<double,3> cell_size = {1,1,1}; //grid.getCellDims(I,J,k);
             const auto& D = effectiveExtent(direction, ntg[active_index], cell_size);
 
             /* We start with the absolute happy path; both CF and Kh are explicitly given in the deck. */
@@ -413,9 +413,10 @@ inline std::array< size_t, 3> directionIndices(const Opm::Connection::Direction 
                                       same_ijk );
             if (prev == this->m_connections.end()) {
                 std::size_t noConn = this->m_connections.size();
+                double depth = 0.0; //grid.getCellDepth(I,J,k);
                 this->addConnection(I,J,k,
                                     grid.getGlobalIndex(I,J,k),
-                                    grid.getCellDepth( I,J,k ),
+                                    depth,
                                     state,
                                     CF,
                                     Kh,
@@ -433,7 +434,7 @@ inline std::array< size_t, 3> directionIndices(const Opm::Connection::Direction 
                 std::size_t css_ind = prev->sort_value();
                 int conSegNo = prev->segment();
                 const auto& perf_range = prev->perf_range();
-                double depth = grid.getCellDepth(I,J,k);
+                double depth = 0.0; //grid.getCellDepth(I,J,k);
                 *prev = Connection(I,J,k,
                                    grid.getGlobalIndex(I,J,k),
                                    prev->complnum(),

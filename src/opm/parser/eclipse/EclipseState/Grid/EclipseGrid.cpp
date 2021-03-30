@@ -292,7 +292,7 @@ EclipseGrid::EclipseGrid(const Deck& deck, const int * actnum)
             } else if (hasGDFILE(deck)) {
                 initBinaryGrid(deck);
             } else {
-                throw std::invalid_argument("EclipseGrid needs cornerpoint or cartesian keywords.");
+                this->resetACTNUM();//throw std::invalid_argument("EclipseGrid needs cornerpoint or cartesian keywords.");
             }
         }
 
@@ -1395,8 +1395,9 @@ std::vector<double> EclipseGrid::createDVector(const std::array<int,3>& dims, st
     }
 
     std::vector<double> EclipseGrid::activeVolume() const {
-        std::vector<double> active_volume( this->m_nactive );
-
+        std::vector<double> active_volume( this->m_nactive, 1.0 );
+        if(true)
+            return active_volume;
         #pragma omp parallel for schedule(static)
         for (std::size_t active_index = 0; active_index < this->m_active_to_global.size(); active_index++) {
             std::array<double,8> X;

@@ -325,6 +325,9 @@ std::vector<double> extract_cell_volume(const EclipseGrid& grid) {
 
 std::vector<double> extract_cell_depth(const EclipseGrid& grid) {
     std::vector<double> cell_depth(grid.getNumActive());
+    if(true)
+        return cell_depth;
+
     for (std::size_t active_index = 0; active_index < grid.getNumActive(); active_index++)
         cell_depth[active_index] = grid.getCellDepth( grid.getGlobalIndex(active_index));
     return cell_depth;
