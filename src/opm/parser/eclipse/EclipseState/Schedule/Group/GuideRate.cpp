@@ -30,7 +30,7 @@
 #include <utility>
 #include <fmt/core.h>
 #include <stddef.h>
-
+#include <iostream>
 namespace Opm {
 
 double GuideRate::RateVector::eval(Well::GuideRateTarget target) const
@@ -213,15 +213,21 @@ void GuideRate::compute(const std::string& wgname,
     if (!config.has_injection_group(phase, wgname))
         return;
 
-    if (guide_rate > 0) {
+    std::cout << wgname << " " << guide_rate << std::endl;
+
+    if (guide_rate > 0)
         this->injection_group_values[std::make_pair(phase, wgname)] = guide_rate;
+}
+
+void GuideRate::compute(const std::string& wgname,
+                        const Phase& phase,
+                        size_t report_step)
+{
+    const auto& config = this->schedule.guideRateConfig(report_step);
+    if (!config.has_injection_group(phase, wgname))
         return;
-    }
 
     const auto& group = config.injection_group(phase, wgname);
-    if (group.target == Group::GuideRateInjTarget::POTN) {
-        return;
-    }
     this->injection_group_values[std::make_pair(phase, wgname)] = group.guide_rate;
 }
 

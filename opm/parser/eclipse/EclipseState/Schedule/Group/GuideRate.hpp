@@ -94,6 +94,7 @@ public:
     GuideRate(const Schedule& schedule);
     void   compute(const std::string& wgname, size_t report_step, double sim_time, double oil_pot, double gas_pot, double wat_pot);
     void compute(const std::string& wgname, const Phase& phase, size_t report_step, double guide_rate);
+    void compute(const std::string& wgname, const Phase& phase, size_t report_step);
     double get(const std::string& well, Well::GuideRateTarget target, const RateVector& rates) const;
     double get(const std::string& group, Group::GuideRateProdTarget target, const RateVector& rates) const;
     double get(const std::string& name, GuideRateModel::Target model_target, const RateVector& rates) const;
