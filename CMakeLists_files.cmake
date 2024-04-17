@@ -761,6 +761,7 @@ if(ENABLE_ECL_INPUT)
     examples/make_ext_smry.cpp
     examples/co2brinepvt.cpp
     examples/hysteresis.cpp
+    examples/hysteresis2.cpp
   )
 endif()
 
@@ -777,6 +778,7 @@ if(ENABLE_ECL_INPUT)
     examples/make_esmry.cpp
     examples/co2brinepvt.cpp
     examples/hysteresis.cpp
+    examples/hysteresis2.cpp
   )
 endif()
 
