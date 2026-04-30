@@ -578,6 +578,12 @@ public:
                              unsigned phaseIdx) NOTHING_OR_CONST
     { return viscosity<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
 
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval inverseFormationVolumeFactor(const FluidState& fluidState,
+                                                const ParameterCache<ParamCacheEval>& paramCache,
+                                                unsigned phaseIdx) NOTHING_OR_CONST
+    { return inverseFormationVolumeFactor<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
+
     //! \copydoc BaseFluidSystem::enthalpy
     template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
     STATIC_OR_DEVICE LhsEval enthalpy(const FluidState& fluidState,
@@ -590,6 +596,71 @@ public:
                                   const ParameterCache<ParamCacheEval>& paramCache,
                                   unsigned phaseIdx) NOTHING_OR_CONST
     { return internalEnergy<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval saturatedDensity(const FluidState& fluidState,
+                                    const ParameterCache<ParamCacheEval>& paramCache,
+                                    unsigned phaseIdx) NOTHING_OR_CONST
+    { return saturatedDensity<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE std::pair<LhsEval, LhsEval>
+    inverseFormationVolumeFactorAndViscosity(const FluidState& fluidState,
+                                             const ParameterCache<ParamCacheEval>& paramCache,
+                                             unsigned phaseIdx)
+    {
+        return inverseFormationVolumeFactorAndViscosity<FluidState, LhsEval>(
+            fluidState,
+            phaseIdx,
+            paramCache.regionIndex());
+    }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval saturatedInverseFormationVolumeFactor(const FluidState& fluidState,
+                                                         const ParameterCache<ParamCacheEval>& paramCache,
+                                                         unsigned phaseIdx) NOTHING_OR_CONST
+    { return saturatedInverseFormationVolumeFactor<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval saturatedVaporizationFactor(const FluidState& fluidState,
+                                              const ParameterCache<ParamCacheEval>& paramCache,
+                                              unsigned phaseIdx) NOTHING_OR_CONST
+    { return saturatedVaporizationFactor<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval saturatedDissolutionFactor(const FluidState& fluidState,
+                                              const ParameterCache<ParamCacheEval>& paramCache,
+                                              unsigned phaseIdx,
+                                              const LhsEval& maxOilSaturation) NOTHING_OR_CONST
+    {
+        return saturatedDissolutionFactor<FluidState, LhsEval>(
+            fluidState,
+            phaseIdx,
+            paramCache.regionIndex(),
+            maxOilSaturation);
+    }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval saturatedDissolutionFactor(const FluidState& fluidState,
+                                              const ParameterCache<ParamCacheEval>& paramCache,
+                                              unsigned phaseIdx) NOTHING_OR_CONST
+    { return saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval bubblePointPressure(const FluidState& fluidState,
+                                       const ParameterCache<ParamCacheEval>& paramCache) NOTHING_OR_CONST
+    { return bubblePointPressure<FluidState, LhsEval>(fluidState, paramCache.regionIndex()); }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval dewPointPressure(const FluidState& fluidState,
+                                    const ParameterCache<ParamCacheEval>& paramCache) NOTHING_OR_CONST
+    { return dewPointPressure<FluidState, LhsEval>(fluidState, paramCache.regionIndex()); }
+
+    template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
+    STATIC_OR_DEVICE LhsEval saturationPressure(const FluidState& fluidState,
+                                      const ParameterCache<ParamCacheEval>& paramCache,
+                                      unsigned phaseIdx) NOTHING_OR_CONST
+    { return saturationPressure<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
 
     /****************************************
      * thermodynamic quantities (black-oil specific version: Note that the PVT region
