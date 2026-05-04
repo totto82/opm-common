@@ -662,6 +662,8 @@ public:
                                       unsigned phaseIdx) NOTHING_OR_CONST
     { return saturationPressure<FluidState, LhsEval>(fluidState, phaseIdx, paramCache.regionIndex()); }
 
+private:
+
     /****************************************
      * thermodynamic quantities (black-oil specific version: Note that the PVT region
      * index is explicitly passed instead of a parameter cache object)
@@ -1562,6 +1564,8 @@ public:
         default: throw std::logic_error("Unhandled phase index "+std::to_string(phaseIdx));
         }
     }
+
+public:
 
     /****************************************
      * Auxiliary and convenience methods for the black-oil model

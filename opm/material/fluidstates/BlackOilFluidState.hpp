@@ -683,7 +683,12 @@ public:
      * \brief Return the dynamic viscosity of a fluid phase [Pa s].
      */
     OPM_HOST_DEVICE ValueType viscosity(unsigned phaseIdx) const
-    { return fluidSystem().viscosity(*this, phaseIdx, pvtRegionIdx_); }
+    {
+        typename FluidSystem::template ParameterCache<ValueType> paramCache;
+        paramCache.setRegionIndex(pvtRegionIdx_);
+        paramCache.updateAll(*this);
+        return fluidSystem().viscosity(*this, paramCache, phaseIdx);
+    }
 
     /*!
      * \brief Return the mass fraction of a component in a fluid phase [-].
@@ -784,7 +789,12 @@ public:
      * \brief Return the fugacity coefficient of a component in a fluid phase [-].
      */
     OPM_HOST_DEVICE ValueType fugacityCoefficient(unsigned phaseIdx, unsigned compIdx) const
-    { return fluidSystem().fugacityCoefficient(*this, phaseIdx, compIdx, pvtRegionIdx_); }
+    {
+        typename FluidSystem::template ParameterCache<ValueType> paramCache;
+        paramCache.setRegionIndex(pvtRegionIdx_);
+        paramCache.updateAll(*this);
+        return fluidSystem().fugacityCoefficient(*this, paramCache, phaseIdx, compIdx);
+    }
 
     /*!
      * \brief Return the fugacity of a component in a fluid phase [Pa].
