@@ -128,10 +128,11 @@ public:
                         const Evaluation& temperature,
                         const Evaluation& pressure,
                         const Evaluation& Rs,
-                        const Evaluation& saltConcentration) const
+                        const Evaluation& saltConcentration,
+                        const Evaluation& depth) const
     {
         const Evaluation salinity = salinityFromConcentration(regionIdx, temperature,
-                                                              pressure, saltConcentration);
+                                                              pressure, saltConcentration, depth);
         const Evaluation xlH2 = convertRsToXoG_(Rs,regionIdx);
         return liquidEnthalpyBrineH2_(temperature,
                                       pressure,
@@ -178,10 +179,11 @@ public:
     Evaluation saturatedViscosity(unsigned regionIdx,
                                  const Evaluation& temperature,
                                  const Evaluation& pressure,
-                                 const Evaluation& saltConcentration) const
+                                 const Evaluation& saltConcentration,
+                                 const Evaluation& depth) const
     {
         const Evaluation salinity = salinityFromConcentration(regionIdx, temperature,
-                                                              pressure, saltConcentration);
+                                                              pressure, saltConcentration, depth);
         return Brine::liquidViscosity(temperature, pressure, salinity);
     }
 
@@ -193,10 +195,11 @@ public:
                          const Evaluation& temperature,
                          const Evaluation& pressure,
                          const Evaluation& /*Rsw*/,
-                         const Evaluation& saltConcentration) const
+                         const Evaluation& saltConcentration,
+                         const Evaluation& depth) const
     {
         //TODO: The viscosity does not yet depend on the composition
-        return saturatedViscosity(regionIdx, temperature, pressure, saltConcentration);
+        return saturatedViscosity(regionIdx, temperature, pressure, saltConcentration, depth);
     }
 
     /*!
@@ -217,10 +220,11 @@ public:
     Evaluation saturatedInverseFormationVolumeFactor(unsigned regionIdx,
                                                      const Evaluation& temperature,
                                                      const Evaluation& pressure,
-                                                     const Evaluation& saltconcentration) const
+                                                     const Evaluation& saltconcentration,
+                                                     const Evaluation& depth) const
     {
         const Evaluation salinity = salinityFromConcentration(regionIdx, temperature,
-                                                              pressure, saltconcentration);
+                                                              pressure, saltconcentration, depth);
         Evaluation rsSat = rsSat_(regionIdx, temperature, pressure, salinity);
         return (1.0 - convertRsToXoG_(rsSat,regionIdx))
              * density_(regionIdx, temperature, pressure, rsSat, salinity)
@@ -235,10 +239,11 @@ public:
                                             const Evaluation& temperature,
                                             const Evaluation& pressure,
                                             const Evaluation& Rs,
-                                            const Evaluation& saltConcentration) const
+                                            const Evaluation& saltConcentration,
+                                            const Evaluation& depth) const
     {
         const Evaluation salinity = salinityFromConcentration(regionIdx, temperature,
-                                                              pressure, saltConcentration);
+                                                              pressure, saltConcentration, depth);
         return (1.0 - convertRsToXoG_(Rs,regionIdx))
              * density_(regionIdx, temperature, pressure, Rs, salinity)
              / brineReferenceDensity_[regionIdx];
@@ -275,8 +280,9 @@ public:
         const LhsEval& saltConcentration
             = BlackOil::template getSaltConcentration_<FluidState, LhsEval>(fluidState, regionIdx);
         // TODO: The viscosity does not yet depend on the composition
-        return { this->inverseFormationVolumeFactor(regionIdx, T, p, Rsw, saltConcentration) ,
-                this->saturatedViscosity(regionIdx, T, p, saltConcentration) };
+        const LhsEval depth(0.0);
+        return { this->inverseFormationVolumeFactor(regionIdx, T, p, Rsw, saltConcentration, depth) ,
+            this->saturatedViscosity(regionIdx, T, p, saltConcentration, depth) };
     }
 
     /*!
@@ -321,8 +327,11 @@ public:
     Evaluation saturationPressure(unsigned /*regionIdx*/,
                                   const Evaluation& /*temperature*/,
                                   const Evaluation& /*Rs*/,
-                                  const Evaluation& /*saltConcentration*/) const
+                                  const Evaluation& saltConcentration,
+                                  const Evaluation& depth) const
     {
+        Valgrind::CheckDefined(saltConcentration);
+        Valgrind::CheckDefined(depth);
         throw std::runtime_error("Saturation pressure for the Brine-H2 PVT module "
                                  "has not been implemented yet!");
     }
@@ -351,7 +360,7 @@ public:
                                              const Evaluation& saltConcentration) const
     {
         const Evaluation salinity = salinityFromConcentration(regionIdx, temperature,
-                                                              pressure, saltConcentration);
+                                                              pressure, saltConcentration, Evaluation(0.0));
         return rsSat_(regionIdx, temperature, pressure, salinity);
     }
 
@@ -681,8 +690,10 @@ private:
     const LhsEval salinityFromConcentration(unsigned regionIdx,
                                             const LhsEval&T,
                                             const LhsEval& P,
-                                            const LhsEval& saltConcentration) const
+                                            const LhsEval& saltConcentration,
+                                            const LhsEval& depth) const
     {
+        Valgrind::CheckDefined(depth);
         if (enableSaltConcentration_) {
             // Convert concentration [kg/m³] to mass fraction [kg_salt/kg_solution].
             // First approximation using pure water density

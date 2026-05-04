@@ -92,6 +92,7 @@ public:
                         const Evaluation&,
                         const Evaluation&,
                         const Evaluation&,
+                        const Evaluation&,
                         const Evaluation&) const
     {
         throw std::runtime_error("Requested the enthalpy of water but the thermal option is not enabled");
@@ -110,7 +111,8 @@ public:
                          const Evaluation& temperature,
                          const Evaluation& pressure,
                          const Evaluation& Rsw,
-                         const Evaluation& saltconcentration) const
+                         const Evaluation& saltconcentration,
+                         const Evaluation& /*depth*/) const
     {
         // cf. ECLiPSE 2013.2 technical description, p. 114
         Scalar pRef = referencePressure_[regionIdx];
@@ -120,7 +122,7 @@ public:
         const Evaluation Y = (C-Cv)* (pressure - pRef);
         Evaluation MuwRef = viscosityTables_[regionIdx].eval(saltconcentration, /*extrapolate=*/true);
 
-        const Evaluation& bw = inverseFormationVolumeFactor(regionIdx, temperature, pressure, Rsw, saltconcentration);
+        const Evaluation& bw = inverseFormationVolumeFactor(regionIdx, temperature, pressure, Rsw, saltconcentration, Evaluation(0.0));
 
         return MuwRef * BwRef * bw / (1 + Y * (1 + Y/2));
     }
@@ -133,7 +135,8 @@ public:
     Evaluation saturatedViscosity(unsigned regionIdx,
                                   const Evaluation& temperature,
                                   const Evaluation& pressure,
-                                  const Evaluation& saltconcentration) const
+                                  const Evaluation& saltconcentration,
+                                  const Evaluation& /*depth*/) const
     {
         Scalar pRef = referencePressure_[regionIdx];
         const Evaluation C = compressibilityTables_[regionIdx].eval(saltconcentration, /*extrapolate=*/true);
@@ -142,7 +145,7 @@ public:
         const Evaluation Y = (C-Cv)* (pressure - pRef);
         Evaluation MuwRef = viscosityTables_[regionIdx].eval(saltconcentration, /*extrapolate=*/true);
 
-        const Evaluation& bw = saturatedInverseFormationVolumeFactor(regionIdx, temperature, pressure, saltconcentration);
+        const Evaluation& bw = saturatedInverseFormationVolumeFactor(regionIdx, temperature, pressure, saltconcentration, Evaluation(0.0));
 
         return MuwRef * BwRef * bw / (1 + Y * (1 + Y/2));
     }
@@ -154,11 +157,12 @@ public:
     Evaluation saturatedInverseFormationVolumeFactor(unsigned regionIdx,
                                                     const Evaluation& temperature,
                                                     const Evaluation& pressure,
-                                                    const Evaluation& saltconcentration) const
+                                                    const Evaluation& saltconcentration,
+                                                    const Evaluation& /*depth*/) const
     {
         Evaluation Rsw = 0.0;
         return inverseFormationVolumeFactor(regionIdx, temperature, pressure,
-                                            Rsw, saltconcentration);
+                                            Rsw, saltconcentration, Evaluation(0.0));
     }
     /*!
      * \brief Returns the formation volume factor [-] of the fluid phase.
@@ -168,7 +172,8 @@ public:
                                             const Evaluation& /*temperature*/,
                                             const Evaluation& pressure,
                                             const Evaluation& /*Rsw*/,
-                                            const Evaluation& saltconcentration) const
+                                            const Evaluation& saltconcentration,
+                                            const Evaluation& /*depth*/) const
     {
         Scalar pRef = referencePressure_[regionIdx];
 
@@ -219,7 +224,8 @@ public:
     Evaluation saturationPressure(unsigned /*regionIdx*/,
                                   const Evaluation& /*temperature*/,
                                   const Evaluation& /*Rs*/,
-                                  const Evaluation& /*saltconcentration*/) const
+                                  const Evaluation& /*saltconcentration*/,
+                                  const Evaluation& /*depth*/) const
     { return 0.0; /* this is dead water, so there isn't any meaningful saturation pressure! */ }
 
     /*!
