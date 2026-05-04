@@ -686,6 +686,7 @@ public:
     {
         typename FluidSystem::template ParameterCache<ValueType> paramCache;
         paramCache.setRegionIndex(pvtRegionIdx_);
+        paramCache.setDepth(0.0);
         paramCache.updateAll(*this);
         return fluidSystem().viscosity(*this, paramCache, phaseIdx);
     }
@@ -792,6 +793,7 @@ public:
     {
         typename FluidSystem::template ParameterCache<ValueType> paramCache;
         paramCache.setRegionIndex(pvtRegionIdx_);
+        paramCache.setDepth(0.0);
         paramCache.updateAll(*this);
         return fluidSystem().fugacityCoefficient(*this, paramCache, phaseIdx, compIdx);
     }

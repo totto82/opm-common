@@ -96,10 +96,12 @@ public:
     struct ParameterCache : public NullParameterCache<EvaluationT>
     {
         using Evaluation = EvaluationT;
+        using CacheScalar = typename MathToolbox<Evaluation>::Scalar;
 
     public:
         explicit ParameterCache(unsigned regionIdx = 0)
             : regionIdx_(regionIdx)
+            , depth_(0.0)
         {
         }
 
@@ -107,13 +109,14 @@ public:
          * \brief Copy the data which is not dependent on the type of the Scalars from
          *        another parameter cache.
          *
-         * For the black-oil parameter cache this means that the region index must be
-         * copied.
+         * For the black-oil parameter cache this means that persistent context like
+         * the region index and depth must be copied.
          */
         template <class OtherCache>
         void assignPersistentData(const OtherCache& other)
         {
             regionIdx_ = other.regionIndex();
+            depth_ = other.depth();
         }
 
         /*!
@@ -126,6 +129,10 @@ public:
         unsigned regionIndex() const
         { return regionIdx_; }
 
+        /*! \brief Return the depth used by depth-dependent PVT relations. */
+        CacheScalar depth() const
+        { return depth_; }
+
         /*!
          * \brief Set the index of the region which should be used to determine the
          *        thermodynamic properties
@@ -136,8 +143,13 @@ public:
         void setRegionIndex(unsigned val)
         { regionIdx_ = val; }
 
+        /*! \brief Set the depth used by depth-dependent PVT relations. */
+        void setDepth(CacheScalar val)
+        { depth_ = val; }
+
     private:
         unsigned regionIdx_;
+        CacheScalar depth_;
     };
 
     #else

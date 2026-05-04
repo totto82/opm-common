@@ -152,6 +152,7 @@ void ensureBlackoilApi()
 
         typename FluidSystem::template ParameterCache<Eval> paramCache;
         paramCache.setRegionIndex(0);
+        paramCache.setDepth(0.0);
         paramCache.updateAll(fluidState);
 
         for (unsigned phaseIdx = 0; phaseIdx < FluidSystem::numPhases; ++ phaseIdx) {
