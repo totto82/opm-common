@@ -44,6 +44,7 @@
 #include <opm/material/components/CO2Tables.hpp>
 #include <opm/material/binarycoefficients/H2O_CO2.hpp>
 #include <opm/material/binarycoefficients/Brine_CO2.hpp>
+#include <opm/material/common/Tabulated1DFunction.hpp>
 #include <opm/material/fluidsystems/BlackOilFunctions.hpp>
 
 #include <opm/input/eclipse/EclipseState/Co2StoreConfig.hpp>
@@ -832,6 +833,9 @@ private:
             return saltConcentration / rho_brine;
         }
 
+        if (salinivdTable_.numSamples() > 0)
+            return LhsEval(salinivdTable_.eval(getValue(depth), /*extrapolate=*/true));
+
         return salinity(regionIdx);
     }
 
@@ -851,6 +855,7 @@ private:
     bool enableEzrokhiViscosity_ = false;
     bool enableDissolution_ = true;
     bool enableSaltConcentration_ = false;
+    Tabulated1DFunction<Scalar> salinivdTable_{};
     int activityModel_{};
     Co2StoreConfig::LiquidMixingType liquidMixType_{};
     Co2StoreConfig::SaltMixingType saltMixType_{};
