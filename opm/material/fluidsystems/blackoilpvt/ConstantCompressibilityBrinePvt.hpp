@@ -112,7 +112,7 @@ public:
                          const Evaluation& pressure,
                          const Evaluation& Rsw,
                          const Evaluation& saltconcentration,
-                         const Evaluation& /*depth*/) const
+                         const Evaluation& depth) const
     {
         // cf. ECLiPSE 2013.2 technical description, p. 114
         Scalar pRef = referencePressure_[regionIdx];
@@ -122,7 +122,7 @@ public:
         const Evaluation Y = (C-Cv)* (pressure - pRef);
         Evaluation MuwRef = viscosityTables_[regionIdx].eval(saltconcentration, /*extrapolate=*/true);
 
-        const Evaluation& bw = inverseFormationVolumeFactor(regionIdx, temperature, pressure, Rsw, saltconcentration, Evaluation(0.0));
+        const Evaluation& bw = inverseFormationVolumeFactor(regionIdx, temperature, pressure, Rsw, saltconcentration, depth);
 
         return MuwRef * BwRef * bw / (1 + Y * (1 + Y/2));
     }
@@ -136,7 +136,7 @@ public:
                                   const Evaluation& temperature,
                                   const Evaluation& pressure,
                                   const Evaluation& saltconcentration,
-                                  const Evaluation& /*depth*/) const
+                                  const Evaluation& depth) const
     {
         Scalar pRef = referencePressure_[regionIdx];
         const Evaluation C = compressibilityTables_[regionIdx].eval(saltconcentration, /*extrapolate=*/true);
@@ -145,7 +145,7 @@ public:
         const Evaluation Y = (C-Cv)* (pressure - pRef);
         Evaluation MuwRef = viscosityTables_[regionIdx].eval(saltconcentration, /*extrapolate=*/true);
 
-        const Evaluation& bw = saturatedInverseFormationVolumeFactor(regionIdx, temperature, pressure, saltconcentration, Evaluation(0.0));
+        const Evaluation& bw = saturatedInverseFormationVolumeFactor(regionIdx, temperature, pressure, saltconcentration, depth);
 
         return MuwRef * BwRef * bw / (1 + Y * (1 + Y/2));
     }
@@ -158,11 +158,11 @@ public:
                                                     const Evaluation& temperature,
                                                     const Evaluation& pressure,
                                                     const Evaluation& saltconcentration,
-                                                    const Evaluation& /*depth*/) const
+                                                    const Evaluation& depth) const
     {
         Evaluation Rsw = 0.0;
         return inverseFormationVolumeFactor(regionIdx, temperature, pressure,
-                                            Rsw, saltconcentration, Evaluation(0.0));
+                                            Rsw, saltconcentration, depth);
     }
     /*!
      * \brief Returns the formation volume factor [-] of the fluid phase.

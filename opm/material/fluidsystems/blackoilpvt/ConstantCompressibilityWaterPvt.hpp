@@ -141,10 +141,10 @@ public:
                                   const Evaluation& temperature,
                                   const Evaluation& pressure,
                                   const Evaluation& saltconcentration,
-                                  const Evaluation& /*depth*/) const
+                                  const Evaluation& depth) const
     {
         Scalar BwMuwRef = waterViscosity_[regionIdx]*waterReferenceFormationVolumeFactor_[regionIdx];
-        const Evaluation& bw = saturatedInverseFormationVolumeFactor(regionIdx, temperature, pressure, saltconcentration, Evaluation(0.0));
+        const Evaluation& bw = saturatedInverseFormationVolumeFactor(regionIdx, temperature, pressure, saltconcentration, depth);
 
         Scalar pRef = waterReferencePressure_[regionIdx];
         const Evaluation& Y =
@@ -162,10 +162,10 @@ public:
                          const Evaluation& pressure,
                          const Evaluation& Rsw,
                          const Evaluation& saltconcentration,
-                         const Evaluation& /*depth*/) const
+                         const Evaluation& depth) const
     {
         Scalar BwMuwRef = waterViscosity_[regionIdx]*waterReferenceFormationVolumeFactor_[regionIdx];
-        const Evaluation& bw = inverseFormationVolumeFactor(regionIdx, temperature, pressure, Rsw, saltconcentration, Evaluation(0.0));
+        const Evaluation& bw = inverseFormationVolumeFactor(regionIdx, temperature, pressure, Rsw, saltconcentration, depth);
 
         Scalar pRef = waterReferencePressure_[regionIdx];
         const Evaluation& Y =
@@ -182,11 +182,11 @@ public:
                                                      const Evaluation& temperature,
                                                      const Evaluation& pressure,
                                                      const Evaluation& saltconcentration,
-                                                     const Evaluation& /*depth*/) const
+                                                     const Evaluation& depth) const
     {
       Evaluation Rsw = 0.0;
       return inverseFormationVolumeFactor(regionIdx, temperature, pressure,
-                                          Rsw, saltconcentration, Evaluation(0.0));
+                                          Rsw, saltconcentration, depth);
     }
 
     /*!
