@@ -624,7 +624,8 @@ public:
         return inverseFormationVolumeFactorAndViscosity<FluidState, LhsEval>(
             fluidState,
             phaseIdx,
-            paramCache.regionIndex());
+            paramCache.regionIndex(),
+            paramCache.depth());
     }
 
     template <class FluidState, class LhsEval = typename FluidState::ValueType, class ParamCacheEval = LhsEval>
@@ -999,7 +1000,8 @@ private:
     STATIC_OR_DEVICE std::pair<LhsEval, LhsEval>
     inverseFormationVolumeFactorAndViscosity(const FluidState& fluidState,
                                              unsigned phaseIdx,
-                                             unsigned regionIdx)
+                                             unsigned regionIdx,
+                                             const LhsEval& depth)
     {
         switch (phaseIdx) {
         case oilPhaseIdx:
@@ -1007,7 +1009,7 @@ private:
         case gasPhaseIdx:
             return gasPvt_.inverseFormationVolumeFactorAndViscosity(fluidState, regionIdx);
         case waterPhaseIdx:
-            return waterPvt_.inverseFormationVolumeFactorAndViscosity(fluidState, regionIdx);
+            return waterPvt_.inverseFormationVolumeFactorAndViscosity(fluidState, regionIdx, depth);
         default:
             throw std::logic_error("Unhandled phase index "+std::to_string(phaseIdx));
         }

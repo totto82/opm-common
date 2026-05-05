@@ -140,7 +140,7 @@ public:
                         const Evaluation& pressure,
                         const Evaluation& Rsw,
                         const Evaluation& saltconcentration,
-                        const Evaluation& depth = Evaluation(0.0)) const
+                        const Evaluation& depth) const
     { OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.internalEnergy(regionIdx, temperature, pressure, Rsw, saltconcentration, depth)); }
 
     Scalar hVap(unsigned regionIdx) const;
@@ -154,7 +154,7 @@ public:
                          const Evaluation& pressure,
                          const Evaluation& Rsw,
                          const Evaluation& saltconcentration,
-                         const Evaluation& depth = Evaluation(0.0)) const
+                         const Evaluation& depth) const
     {
         OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.viscosity(regionIdx, temperature, pressure, Rsw, saltconcentration, depth));
     }
@@ -172,7 +172,7 @@ public:
                                   const Evaluation& temperature,
                                   const Evaluation& pressure,
                                   const Evaluation& saltconcentration,
-                                  const Evaluation& depth = Evaluation(0.0)) const
+                                  const Evaluation& depth) const
     {
         OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.saturatedViscosity(regionIdx, temperature, pressure, saltconcentration, depth));
     }
@@ -186,7 +186,7 @@ public:
                                             const Evaluation& pressure,
                                             const Evaluation& Rsw,
                                             const Evaluation& saltconcentration,
-                                            const Evaluation& depth = Evaluation(0.0)) const
+                                            const Evaluation& depth) const
     {
         OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.inverseFormationVolumeFactor(regionIdx, temperature, pressure, Rsw, saltconcentration, depth));
     }
@@ -196,8 +196,8 @@ public:
      */
     template <class FluidState, class LhsEval = typename FluidState::ValueType>
     std::pair<LhsEval, LhsEval>
-    inverseFormationVolumeFactorAndViscosity(const FluidState& fluidState, unsigned regionIdx)
-    { OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.inverseFormationVolumeFactorAndViscosity(fluidState, regionIdx)); }
+    inverseFormationVolumeFactorAndViscosity(const FluidState& fluidState, unsigned regionIdx, const LhsEval& depth)
+    { OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.inverseFormationVolumeFactorAndViscosity(fluidState, regionIdx, depth)); }
 
         /*!
      * \brief Returns the formation volume factor [-] of the fluid phase.
@@ -207,7 +207,7 @@ public:
                                                      const Evaluation& temperature,
                                                      const Evaluation& pressure,
                                                      const Evaluation& saltconcentration,
-                                                     const Evaluation& depth = Evaluation(0.0)) const
+                                                     const Evaluation& depth) const
     {
         OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.saturatedInverseFormationVolumeFactor(regionIdx, temperature, pressure, saltconcentration, depth));
     }
@@ -220,7 +220,7 @@ public:
                                              const Evaluation& temperature,
                                              const Evaluation& pressure,
                                              const Evaluation& saltconcentration,
-                                             const Evaluation& depth = Evaluation(0.0)) const
+                                             const Evaluation& depth) const
     {
         static_cast<void>(depth);
         OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.saturatedGasDissolutionFactor(regionIdx, temperature, pressure, saltconcentration));
@@ -238,7 +238,7 @@ public:
                                   const Evaluation& temperature,
                                   const Evaluation& Rs,
                                   const Evaluation& saltconcentration,
-                                  const Evaluation& depth = Evaluation(0.0)) const
+                                  const Evaluation& depth) const
     { OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.saturationPressure(regionIdx, temperature, Rs, saltconcentration, depth)); }
 
     /*!

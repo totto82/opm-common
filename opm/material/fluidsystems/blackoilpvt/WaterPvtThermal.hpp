@@ -315,9 +315,9 @@ public:
      */
     template <class FluidState, class LhsEval = typename FluidState::ValueType>
     std::pair<LhsEval, LhsEval>
-    inverseFormationVolumeFactorAndViscosity(const FluidState& fluidState, unsigned regionIdx)
+    inverseFormationVolumeFactorAndViscosity(const FluidState& fluidState, unsigned regionIdx, const LhsEval& depth)
     {
-        auto [b, mu] = isothermalPvt_->inverseFormationVolumeFactorAndViscosity(fluidState, regionIdx);
+        auto [b, mu] = isothermalPvt_->inverseFormationVolumeFactorAndViscosity(fluidState, regionIdx, depth);
         const LhsEval& pressure = decay<LhsEval>(fluidState.pressure(FluidState::waterPhaseIdx));
         const LhsEval& temperature = decay<LhsEval>(fluidState.temperature(FluidState::waterPhaseIdx));
         if (enableThermalDensity()) {

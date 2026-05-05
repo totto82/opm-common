@@ -268,7 +268,7 @@ public:
      */
     template <class FluidState, class LhsEval = typename FluidState::ValueType>
     std::pair<LhsEval, LhsEval>
-    inverseFormationVolumeFactorAndViscosity(const FluidState& fluidState, unsigned regionIdx)
+    inverseFormationVolumeFactorAndViscosity(const FluidState& fluidState, unsigned regionIdx, const LhsEval& depth = LhsEval(0.0))
     {
         // Deal with the possibility that we are in a two-phase H2STORE with OIL and GAS as phases.
         const bool waterIsActive = fluidState.phaseIsActive(FluidState::waterPhaseIdx);
@@ -280,7 +280,6 @@ public:
         const LhsEval& saltConcentration
             = BlackOil::template getSaltConcentration_<FluidState, LhsEval>(fluidState, regionIdx);
         // TODO: The viscosity does not yet depend on the composition
-        const LhsEval depth(0.0);
         return { this->inverseFormationVolumeFactor(regionIdx, T, p, Rsw, saltConcentration, depth) ,
             this->saturatedViscosity(regionIdx, T, p, saltConcentration, depth) };
     }
