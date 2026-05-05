@@ -150,7 +150,7 @@ void ensureBlackoilApi()
         std::cout << FluidSystem::convertRsToXoG(Rs, /*regionIdx=*/0);
         std::cout << FluidSystem::convertRvToXgO(Rv, /*regionIdx=*/0);
 
-        typename FluidSystem::template ParameterCache<Eval> paramCache;
+        typename FluidSystem::template ParameterCache<Evaluation> paramCache;
         paramCache.setRegionIndex(0);
         paramCache.setDepth(0.0);
         paramCache.updateAll(fluidState);
