@@ -292,7 +292,8 @@ public:
     Evaluation saturatedGasDissolutionFactor(unsigned /*regionIdx*/,
                                              const Evaluation& /*temperature*/,
                                              const Evaluation& /*pressure*/,
-                                             const Evaluation& /*saltconcentration*/) const
+                                             const Evaluation& /*saltconcentration*/,
+                                             const Evaluation& /*depth*/) const
     { return 0.0; /* this is dead water! */ }
 
     Scalar waterReferenceDensity(unsigned regionIdx) const

@@ -222,8 +222,7 @@ public:
                                              const Evaluation& saltconcentration,
                                              const Evaluation& depth) const
     {
-        static_cast<void>(depth);
-        OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.saturatedGasDissolutionFactor(regionIdx, temperature, pressure, saltconcentration));
+        OPM_WATER_PVT_MULTIPLEXER_CALL(return pvtImpl.saturatedGasDissolutionFactor(regionIdx, temperature, pressure, saltconcentration, depth));
     }
 
     /*!

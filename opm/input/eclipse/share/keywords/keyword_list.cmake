@@ -1086,7 +1086,6 @@ set( keywords
      001_Eclipse300/P/PREFS
      001_Eclipse300/R/REGION2REGION_PROBE_E300
      001_Eclipse300/S/SALINITY
-    900_OPM/S/SALINIVD
      001_Eclipse300/S/SOLID
      001_Eclipse300/S/STCOND
      001_Eclipse300/T/TCRIT
@@ -1178,6 +1177,7 @@ set( keywords
      900_OPM/R/RVW
      900_OPM/R/RVWVD
      900_OPM/R/RWGSALT
+     900_OPM/S/SALINIVD
      900_OPM/S/SALTMF
      900_OPM/S/SALTP
      900_OPM/S/SALTPVD

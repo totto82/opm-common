@@ -406,8 +406,8 @@ public:
      */
     template <class Evaluation>
     OPM_HOST_DEVICE Evaluation saturationPressure(unsigned /*regionIdx*/,
-                                  const Evaluation& /*temperature*/,
-                                  const Evaluation& /*Rs*/) const
+                                                  const Evaluation& /*temperature*/,
+                                                  const Evaluation& /*Rs*/) const
     {
 #if OPM_IS_INSIDE_DEVICE_FUNCTION
         assert(false && "Requested the saturation pressure for the brine-co2 pvt module. Not yet implemented.");
@@ -425,8 +425,8 @@ public:
      */
     template <class Evaluation>
     OPM_HOST_DEVICE Evaluation saturationPressure(unsigned /*regionIdx*/,
-                                  const Evaluation& /*temperature*/,
-                                  const Evaluation& /*Rs*/,
+                                                  const Evaluation& /*temperature*/,
+                                                  const Evaluation& /*Rs*/,
                       const Evaluation& saltConcentration,
                       const Evaluation& depth) const
     {
@@ -447,24 +447,11 @@ public:
     OPM_HOST_DEVICE Evaluation saturatedGasDissolutionFactor(unsigned regionIdx,
                                              const Evaluation& temperature,
                                              const Evaluation& pressure,
-                                             const Evaluation& /*oilSaturation*/,
-                                             const Evaluation& /*maxOilSaturation*/) const
-    {
-        //TODO support VAPPARS
-        return rsSat(regionIdx, temperature, pressure, Evaluation(salinity_[regionIdx]));
-    }
-
-    /*!
-     * \brief Returns the gas dissoluiton factor \f$R_s\f$ [m^3/m^3] of the liquid phase.
-     */
-    template <class Evaluation>
-    OPM_HOST_DEVICE Evaluation saturatedGasDissolutionFactor(unsigned regionIdx,
-                                             const Evaluation& temperature,
-                                             const Evaluation& pressure,
-                                             const Evaluation& saltConcentration) const
+                                             const Evaluation& saltConcentration,
+                                             const Evaluation& depth) const
     {
         const Evaluation salinity = salinityFromConcentration(regionIdx, temperature,
-                                                              pressure, saltConcentration, Evaluation(0.0));
+                                                              pressure, saltConcentration, depth);
         return rsSat(regionIdx, temperature, pressure, salinity);
     }
 

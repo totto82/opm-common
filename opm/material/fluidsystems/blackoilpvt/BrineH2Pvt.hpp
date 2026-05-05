@@ -336,30 +336,17 @@ public:
     }
 
     /*!
-    * \brief Returns the gas dissolution factor \f$R_s\f$ [m^3/m^3] of the liquid phase.
-    */
-    template <class Evaluation>
-    Evaluation saturatedGasDissolutionFactor(unsigned regionIdx,
-                                             const Evaluation& temperature,
-                                             const Evaluation& pressure,
-                                             const Evaluation& /*oilSaturation*/,
-                                             const Evaluation& /*maxOilSaturation*/) const
-    {
-        //TODO support VAPPARS
-        return rsSat_(regionIdx, temperature, pressure, Evaluation(salinity_[regionIdx]));
-    }
-
-    /*!
     * \brief Returns the gas dissoluiton factor \f$R_s\f$ [m^3/m^3] of the liquid phase.
     */
     template <class Evaluation>
     Evaluation saturatedGasDissolutionFactor(unsigned regionIdx,
                                              const Evaluation& temperature,
                                              const Evaluation& pressure,
-                                             const Evaluation& saltConcentration) const
+                                             const Evaluation& saltConcentration,
+                                             const Evaluation& depth) const
     {
         const Evaluation salinity = salinityFromConcentration(regionIdx, temperature,
-                                                              pressure, saltConcentration, Evaluation(0.0));
+                                                              pressure, saltConcentration, depth);
         return rsSat_(regionIdx, temperature, pressure, salinity);
     }
 
