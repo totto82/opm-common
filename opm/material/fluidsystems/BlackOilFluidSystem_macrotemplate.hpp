@@ -687,7 +687,7 @@ private:
     STATIC_OR_DEVICE LhsEval density(const FluidState& fluidState,
                            unsigned phaseIdx,
                            unsigned regionIdx,
-                           const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                           const LhsEval& depth) NOTHING_OR_CONST
     {
         assert(phaseIdx <= numPhases);
         assert(regionIdx <= numRegions());
@@ -796,7 +796,7 @@ private:
     STATIC_OR_DEVICE LhsEval saturatedDensity(const FluidState& fluidState,
                                     unsigned phaseIdx,
                                     unsigned regionIdx,
-                                    const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                                    const LhsEval& depth) NOTHING_OR_CONST
     {
         assert(phaseIdx <= numPhases);
         assert(regionIdx <= numRegions());
@@ -818,7 +818,7 @@ private:
 
             if (enableDissolvedGas()) {
                 // miscible oil
-                const LhsEval& Rs = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, oilPhaseIdx, regionIdx);
+                const LhsEval& Rs = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, oilPhaseIdx, regionIdx, depth);
                 const LhsEval& bo = oilPvt_.inverseFormationVolumeFactor(regionIdx, T, p, Rs);
 
                 return
@@ -835,7 +835,7 @@ private:
         case gasPhaseIdx: {
             if (enableVaporizedOil() && enableVaporizedWater()) {
                 // gas containing vaporized oil and vaporized water
-                const LhsEval& Rv = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, gasPhaseIdx, regionIdx);
+                const LhsEval& Rv = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, gasPhaseIdx, regionIdx, depth);
                 const LhsEval& Rvw = saturatedVaporizationFactor<FluidState, LhsEval>(fluidState, gasPhaseIdx, regionIdx);
                 const LhsEval& bg = gasPvt_.inverseFormationVolumeFactor(regionIdx, T, p, Rv, Rvw);
 
@@ -848,7 +848,7 @@ private:
             if (enableVaporizedOil()) {
                 // miscible gas
                 const LhsEval Rvw(0.0);
-                const LhsEval& Rv = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, gasPhaseIdx, regionIdx);
+                const LhsEval& Rv = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, gasPhaseIdx, regionIdx, depth);
                 const LhsEval& bg = gasPvt_.inverseFormationVolumeFactor(regionIdx, T, p, Rv, Rvw);
 
                 return
@@ -881,7 +881,7 @@ private:
             if (enableDissolvedGasInWater()) {
                  // miscible in water
                 const auto& saltConcentration = decay<LhsEval>(fluidState.saltConcentration());
-                const LhsEval& Rsw = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, waterPhaseIdx, regionIdx);
+                const LhsEval& Rsw = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, waterPhaseIdx, regionIdx, depth);
                 const LhsEval& bw = waterPvt_.inverseFormationVolumeFactor(regionIdx, T, p, Rsw, saltConcentration, depth);
                 return
                     bw*referenceDensity(waterPhaseIdx, regionIdx)
@@ -908,7 +908,7 @@ private:
     STATIC_OR_DEVICE LhsEval inverseFormationVolumeFactor(const FluidState& fluidState,
                                                 unsigned phaseIdx,
                                                 unsigned regionIdx,
-                                                const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                                                const LhsEval& depth) NOTHING_OR_CONST
     {
         OPM_TIMEBLOCK_LOCAL(inverseFormationVolumeFactor, Subsystem::PvtProps);
         assert(phaseIdx <= numPhases);
@@ -1028,7 +1028,7 @@ private:
     STATIC_OR_DEVICE LhsEval saturatedInverseFormationVolumeFactor(const FluidState& fluidState,
                                                          unsigned phaseIdx,
                                                          unsigned regionIdx,
-                                                         const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                                                         const LhsEval& depth) NOTHING_OR_CONST
     {
         OPM_TIMEBLOCK_LOCAL(saturatedInverseFormationVolumeFactor, Subsystem::PvtProps);
         assert(phaseIdx <= numPhases);
@@ -1173,7 +1173,7 @@ private:
     STATIC_OR_DEVICE LhsEval viscosity(const FluidState& fluidState,
                              unsigned phaseIdx,
                              unsigned regionIdx,
-                             const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                             const LhsEval& depth) NOTHING_OR_CONST
     {
         OPM_TIMEBLOCK_LOCAL(viscosity, Subsystem::PvtProps);
         assert(phaseIdx <= numPhases);
@@ -1266,7 +1266,7 @@ private:
     STATIC_OR_DEVICE LhsEval internalEnergy(const FluidState& fluidState,
                                   const unsigned phaseIdx,
                                   const unsigned regionIdx,
-                                  const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                                  const LhsEval& depth) NOTHING_OR_CONST
     {
         const auto p = decay<LhsEval>(fluidState.pressure(phaseIdx));
         const auto T = decay<LhsEval>(fluidState.temperature(phaseIdx));
@@ -1314,7 +1314,7 @@ private:
     STATIC_OR_DEVICE LhsEval internalMixingTotalEnergy(const FluidState& fluidState,
                                              unsigned phaseIdx,
                                              unsigned regionIdx,
-                                             const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                                             const LhsEval& depth) NOTHING_OR_CONST
     {
         assert(phaseIdx <= numPhases);
         assert(regionIdx <= numRegions());
@@ -1424,7 +1424,7 @@ private:
                                             BlackOil::template getRv_<ThisType, FluidState, LhsEval>(fluidState, regionIdx),
                                             BlackOil::template getRvw_<ThisType, FluidState, LhsEval>(fluidState, regionIdx));
                 // gas miscible in water
-                const LhsEval& Rsw = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, waterPhaseIdx, regionIdx);
+                const LhsEval& Rsw = saturatedDissolutionFactor<FluidState, LhsEval>(fluidState, waterPhaseIdx, regionIdx, depth);
                 const LhsEval& bw = waterPvt_.inverseFormationVolumeFactor(regionIdx, T, p, Rsw, saltConcentration, depth);
                 return
                     waterEnergy*bw*referenceDensity(waterPhaseIdx, regionIdx)
@@ -1445,7 +1445,7 @@ private:
     STATIC_OR_DEVICE LhsEval enthalpy(const FluidState& fluidState,
                             unsigned phaseIdx,
                             unsigned regionIdx,
-                            const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                            const LhsEval& depth) NOTHING_OR_CONST
     {
         // should preferably not be used values should be taken from intensive quantities fluid state.
         const auto& p = decay<LhsEval>(fluidState.pressure(phaseIdx));
@@ -1494,7 +1494,7 @@ private:
                                               unsigned phaseIdx,
                                               unsigned regionIdx,
                                               const LhsEval& maxOilSaturation,
-                                              const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                                              const LhsEval& depth) NOTHING_OR_CONST
     {
         OPM_TIMEBLOCK_LOCAL(saturatedDissolutionFactor, Subsystem::PvtProps);
         assert(phaseIdx <= numPhases);
@@ -1525,7 +1525,7 @@ private:
     STATIC_OR_DEVICE LhsEval saturatedDissolutionFactor(const FluidState& fluidState,
                                               unsigned phaseIdx,
                                               unsigned regionIdx,
-                                              const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                                              const LhsEval& depth) NOTHING_OR_CONST
     {
         OPM_TIMEBLOCK_LOCAL(saturatedDissolutionFactor, Subsystem::PvtProps);
         assert(phaseIdx <= numPhases);
@@ -1550,7 +1550,7 @@ private:
     STATIC_OR_DEVICE LhsEval bubblePointPressure(const FluidState& fluidState,
                                        unsigned regionIdx) NOTHING_OR_CONST
     {
-        return saturationPressure(fluidState, oilPhaseIdx, regionIdx);
+        return saturationPressure(fluidState, oilPhaseIdx, regionIdx, LhsEval(0.0));
     }
 
 
@@ -1561,7 +1561,7 @@ private:
     STATIC_OR_DEVICE LhsEval dewPointPressure(const FluidState& fluidState,
                                        unsigned regionIdx) NOTHING_OR_CONST
     {
-        return saturationPressure(fluidState, gasPhaseIdx, regionIdx);
+        return saturationPressure(fluidState, gasPhaseIdx, regionIdx, LhsEval(0.0));
     }
 
     /*!
@@ -1578,7 +1578,7 @@ private:
     STATIC_OR_DEVICE LhsEval saturationPressure(const FluidState& fluidState,
                                       unsigned phaseIdx,
                                       unsigned regionIdx,
-                                      const LhsEval& depth = LhsEval(0.0)) NOTHING_OR_CONST
+                                      const LhsEval& depth) NOTHING_OR_CONST
     {
         assert(phaseIdx <= numPhases);
         assert(regionIdx <= numRegions());
