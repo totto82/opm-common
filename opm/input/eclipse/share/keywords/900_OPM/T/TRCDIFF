@@ -1,0 +1,23 @@
+{
+  "name": "TRCDIFF",
+  "sections": [
+    "PROPS"
+  ],
+  "description": "Molecular diffusion coefficient of a tracer declared with TRACER. Tracers without a record have no diffusion.",
+  "items": [
+    {
+      "name": "TRACER",
+      "value_type": "STRING"
+    },
+    {
+      "name": "PHASE",
+      "value_type": "STRING"
+    },
+    {
+      "name": "D_MOL",
+      "value_type": "DOUBLE",
+      "default": 0,
+      "dimension": "Length*Length/Time"
+    }
+  ]
+}

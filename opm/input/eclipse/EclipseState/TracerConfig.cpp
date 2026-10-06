@@ -53,7 +53,7 @@ namespace {
 
 Opm::Phase phase_from_string(const std::string& phase_string)
 {
-    if (phase_string == "WAT") {
+    if (phase_string == "WAT" || phase_string == "WATER") {
         return Opm::Phase::WATER;
     }
 
@@ -83,6 +83,31 @@ TracerConfig::TracerConfig([[maybe_unused]] const UnitSystem& unit_system,
     if (! deck.hasKeyword<TR>()) {
         return;
     }
+
+    const auto applyDiffusion = [this, &deck]()
+    {
+        using TRCDIFF = ParserKeywords::TRCDIFF;
+        if (! deck.hasKeyword<TRCDIFF>()) {
+            return;
+        }
+
+        for (const auto& record : deck.get<TRCDIFF>().back()) {
+            const auto& name = record.getItem<TRCDIFF::TRACER>().getTrimmedString(0);
+            const auto iter = std::ranges::find_if(this->tracers,
+                                                   [&name](const TracerEntry& tracer)
+                                                   { return tracer.name == name; });
+            if (iter == this->tracers.end()) {
+                throw std::invalid_argument(fmt::format("TRCDIFF: tracer {} is not declared in TRACER", name));
+            }
+
+            const auto phase = phase_from_string(record.getItem<TRCDIFF::PHASE>().getTrimmedString(0));
+            if (phase != iter->phase) {
+                throw std::invalid_argument(fmt::format("TRCDIFF: phase of tracer {} does not match TRACER", name));
+            }
+
+            iter->diffusion_coefficient = record.getItem<TRCDIFF::D_MOL>().getSIDouble(0);
+        }
+    };
 
     const auto& keyword = deck.get<TR>().back();
     OpmLog::info(
@@ -194,6 +219,8 @@ TracerConfig::TracerConfig([[maybe_unused]] const UnitSystem& unit_system,
 
         this->tracers.emplace_back(name, unit_string, phase);
     }
+
+    applyDiffusion();
 }
 
 TracerConfig TracerConfig::serializationTestObject()

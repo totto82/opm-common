@@ -95,6 +95,72 @@ BOOST_AUTO_TEST_CASE(TracerConfigTest)
     BOOST_CHECK(!it->free_tvdp.has_value());
 }
 
+namespace {
+
+Deck createDiffusionDeck(const std::string& trcdiff, const std::string& unit = "METRIC")
+{
+    return Parser{}.parseString(R"xxx(RUNSPEC
+DIMENS
+ 10 10 10 /
+TABDIMS
+3 /
+)xxx" + unit + R"xxx(
+GRID
+DX
+1000*0.25 /
+DY
+1000*0.25 /
+DZ
+1000*0.25 /
+TOPS
+100*0.25 /
+EQLDIMS
+ 3 1 1 /
+
+PROPS
+
+TRACERS
+--  oil  water  gas  env
+    1*   1      1    1*   /
+TRACER
+SEA  WAT  /
+OCE  GAS /
+/
+)xxx" + trcdiff);
+}
+
+} // Anonymous namespace
+
+BOOST_AUTO_TEST_CASE(TracerDiffusionTest)
+{
+    const auto deck = createDiffusionDeck("TRCDIFF\n SEA WATER 1.0E-9 /\n/\n");
+    const auto state = EclipseState{deck};
+    const auto& tc = state.tracer();
+
+    // METRIC input is m2/day, stored in SI (m2/s)
+    BOOST_CHECK_CLOSE(tc["SEA"].diffusion_coefficient, 1.0e-9 / 86400.0, 1e-6);
+    // Tracers without a TRCDIFF record have no diffusion
+    BOOST_CHECK_EQUAL(tc["OCE"].diffusion_coefficient, 0.0);
+}
+
+BOOST_AUTO_TEST_CASE(TracerDiffusionUnitTest)
+{
+    // LAB: cm2/hr -> m2/s
+    const auto deck = createDiffusionDeck("TRCDIFF\n SEA WATER 36.0 /\n/\n", "LAB");
+    const auto state = EclipseState{deck};
+    BOOST_CHECK_CLOSE(state.tracer()["SEA"].diffusion_coefficient, 36.0e-4 / 3600.0, 1e-6);
+}
+
+BOOST_AUTO_TEST_CASE(TracerDiffusionErrorTest)
+{
+    // Unknown tracer
+    BOOST_CHECK_THROW(EclipseState{createDiffusionDeck("TRCDIFF\n XXX WATER 1.0E-9 /\n/\n")},
+                      std::exception);
+    // Phase differs from the one given in TRACER
+    BOOST_CHECK_THROW(EclipseState{createDiffusionDeck("TRCDIFF\n SEA GAS 1.0E-9 /\n/\n")},
+                      std::exception);
+}
+
 BOOST_AUTO_TEST_CASE(SolutionGasSupportTest)
 {
     const auto deck = Parser{}.parseString(R"xxx(RUNSPEC

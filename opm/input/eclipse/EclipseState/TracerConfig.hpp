@@ -45,6 +45,7 @@ public:
         std::optional<std::vector<double>> solution_concentration;
         std::optional<TracerVdTable> free_tvdp;
         std::optional<TracerVdTable> solution_tvdp;
+        double diffusion_coefficient = 0.0; //!< Molecular diffusion coefficient [m2/s] (TRCDIFF)
         std::string fname() const {
             return this->name + "F";
         }
@@ -106,7 +107,8 @@ public:
                    this->free_concentration == data.free_concentration &&
                    this->solution_concentration == data.solution_concentration &&
                    this->free_tvdp == data.free_tvdp &&
-                   this->solution_tvdp == data.solution_tvdp;
+                   this->solution_tvdp == data.solution_tvdp &&
+                   this->diffusion_coefficient == data.diffusion_coefficient;
         }
 
         template<class Serializer>
@@ -119,6 +121,7 @@ public:
             serializer(solution_concentration);
             serializer(this->free_tvdp);
             serializer(this->solution_tvdp);
+            serializer(this->diffusion_coefficient);
         }
     };
 
