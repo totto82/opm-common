@@ -21,6 +21,7 @@
 #ifndef OPM_BC_STATE_HPP
 #define OPM_BC_STATE_HPP
 
+#include <string>
 #include <vector>
 #include <cstddef>
 #include <optional>
@@ -134,6 +135,31 @@ public:
         }
     };
 
+    //! Tracer concentration of the fluid entering through a boundary face (BCTRACER).
+    struct BCTracer
+    {
+        int index{};
+        std::string tracer;
+        BCComponent phase{BCComponent::NONE};
+        double concentration{};
+
+        BCTracer() = default;
+
+        static BCTracer fromBCTracer(const DeckRecord& record);
+        static BCTracer serializationTestObject();
+
+        bool operator==(const BCTracer& other) const;
+
+        template<class Serializer>
+        void serializeOp(Serializer& serializer)
+        {
+            serializer(index);
+            serializer(tracer);
+            serializer(phase);
+            serializer(concentration);
+        }
+    };
+
     BCState() = default;
 
     static BCState serializationTestObject();
@@ -146,15 +172,24 @@ public:
 
     void updateBCProp(const DeckRecord& record);
     void updateBCMech(const DeckRecord& record);
+    void updateBCTracer(const DeckRecord& record);
+
+    //! Concentration of \p tracer in the \p phase entering through boundary face \p index.
+    //! Returns nullopt if no BCTRACER record matches.
+    std::optional<double> tracerConcentration(int index,
+                                              const std::string& tracer,
+                                              BCComponent phase) const;
 
     template<class Serializer>
     void serializeOp(Serializer& serializer)
     {
         serializer(m_faces);
+        serializer(m_tracers);
     }
 
 private:
     std::vector<BCFace> m_faces;
+    std::vector<BCTracer> m_tracers;
 };
 
 } // namespace Opm

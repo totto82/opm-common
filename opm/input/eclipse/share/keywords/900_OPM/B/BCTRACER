@@ -1,0 +1,26 @@
+{
+  "name": "BCTRACER",
+  "sections": [
+    "SCHEDULE"
+  ],
+  "description": "Tracer concentration of the fluid entering through a boundary face defined by BCCON. The flow rate is taken from BCPROP.",
+  "items": [
+    {
+      "name": "INDEX",
+      "value_type": "INT"
+    },
+    {
+      "name": "TRACER",
+      "value_type": "STRING"
+    },
+    {
+      "name": "PHASE",
+      "value_type": "STRING"
+    },
+    {
+      "name": "CONCENTRATION",
+      "value_type": "DOUBLE",
+      "default": 0
+    }
+  ]
+}

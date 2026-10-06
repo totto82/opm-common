@@ -7529,6 +7529,46 @@ BCPROP
     }
 }
 
+BOOST_AUTO_TEST_CASE(createDeckWithBCTracer) {
+    std::string input = R"(
+START             -- 0
+19 JUN 2007 /
+
+SOLUTION
+
+SCHEDULE
+
+BCPROP
+1 RATE WATER -0.1 /
+/
+BCTRACER
+1 IW1 WATER 1.0 /
+1 IW2 WATER 0.5 /
+/
+
+DATES             -- 1
+ 10  OKT 2008 /
+/
+BCTRACER
+1 IW1 WATER 0.25 /
+/
+)";
+
+    const auto& schedule = make_schedule(input);
+    {
+        const auto& bc = schedule[0].bcstate;
+        BOOST_CHECK_EQUAL(bc.tracerConcentration(1, "IW1", Opm::BCComponent::WATER).value(), 1.0);
+        BOOST_CHECK_EQUAL(bc.tracerConcentration(1, "IW2", Opm::BCComponent::WATER).value(), 0.5);
+        BOOST_CHECK(!bc.tracerConcentration(1, "IW1", Opm::BCComponent::OIL).has_value());
+        BOOST_CHECK(!bc.tracerConcentration(2, "IW1", Opm::BCComponent::WATER).has_value());
+    }
+    {
+        const auto& bc = schedule[1].bcstate;
+        BOOST_CHECK_EQUAL(bc.tracerConcentration(1, "IW1", Opm::BCComponent::WATER).value(), 0.25);
+        BOOST_CHECK_EQUAL(bc.tracerConcentration(1, "IW2", Opm::BCComponent::WATER).value(), 0.5);
+    }
+}
+
 BOOST_AUTO_TEST_CASE(createDeckWithSource) {
     std::string input = R"(
 START             -- 0

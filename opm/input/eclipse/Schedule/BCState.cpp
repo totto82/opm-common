@@ -169,6 +169,41 @@ BCState::BCFace BCState::BCFace::fromBCMech(const DeckRecord& record)
     return bcmechface;
 }
 
+using BCTRACERKEY = ParserKeywords::BCTRACER;
+BCState::BCTracer BCState::BCTracer::fromBCTracer(const DeckRecord& record)
+{
+    BCTracer bctracer;
+    bctracer.index = record.getItem<BCTRACERKEY::INDEX>().get<int>(0);
+    bctracer.tracer = record.getItem<BCTRACERKEY::TRACER>().getTrimmedString(0);
+    bctracer.phase = fromstring::component(record.getItem<BCTRACERKEY::PHASE>().get<std::string>(0));
+    if (bctracer.phase != BCComponent::OIL &&
+        bctracer.phase != BCComponent::GAS &&
+        bctracer.phase != BCComponent::WATER) {
+        OPM_THROW(std::invalid_argument,
+                  "BCTRACER: PHASE must be OIL, GAS or WATER for tracer " + bctracer.tracer +
+                  " at INDEX " + std::to_string(bctracer.index));
+    }
+    bctracer.concentration = record.getItem<BCTRACERKEY::CONCENTRATION>().get<double>(0);
+    return bctracer;
+}
+
+BCState::BCTracer BCState::BCTracer::serializationTestObject()
+{
+    BCTracer result;
+    result.index = 100;
+    result.tracer = "TRC";
+    result.phase = BCComponent::WATER;
+    result.concentration = 1.5;
+    return result;
+}
+
+bool BCState::BCTracer::operator==(const BCState::BCTracer& other) const {
+    return this->index == other.index &&
+           this->tracer == other.tracer &&
+           this->phase == other.phase &&
+           this->concentration == other.concentration;
+}
+
 BCState::BCFace BCState::BCFace::serializationTestObject()
 {
     BCFace result;
@@ -250,11 +285,45 @@ void BCState::updateBCMech(const DeckRecord& record)
     }
 }
 
+void BCState::updateBCTracer(const DeckRecord& record)
+{
+    const BCTracer bcnew = BCTracer::fromBCTracer(record);
+    auto it = std::ranges::find_if(m_tracers,
+                                   [&bcnew](const auto& bc)
+                                   {
+                                       return bc.index == bcnew.index &&
+                                              bc.tracer == bcnew.tracer &&
+                                              bc.phase == bcnew.phase;
+                                   });
+    if (it != m_tracers.end()) {
+        it->concentration = bcnew.concentration;
+    } else {
+        this->m_tracers.emplace_back(bcnew);
+    }
+}
+
+std::optional<double> BCState::tracerConcentration(const int index,
+                                                   const std::string& tracer,
+                                                   const BCComponent phase) const
+{
+    const auto it = std::ranges::find_if(m_tracers,
+                                         [&](const auto& bc)
+                                         {
+                                             return bc.index == index &&
+                                                    bc.tracer == tracer &&
+                                                    bc.phase == phase;
+                                         });
+    if (it == m_tracers.end()) {
+        return std::nullopt;
+    }
+    return it->concentration;
+}
 
 BCState BCState::serializationTestObject()
 {
     BCState result;
     result.m_faces = {BCFace::serializationTestObject()};
+    result.m_tracers = {BCTracer::serializationTestObject()};
 
     return result;
 }
@@ -287,7 +356,8 @@ const BCState::BCFace& BCState::operator[](int index) const
 }
 
 bool BCState::operator==(const BCState& other) const {
-    return this->m_faces == other.m_faces;
+    return this->m_faces == other.m_faces &&
+           this->m_tracers == other.m_tracers;
 }
 
 
